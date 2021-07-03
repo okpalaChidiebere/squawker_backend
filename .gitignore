@@ -1,0 +1,10 @@
+**/.DS_Store
+
+# Serverless directories
+.serverless
+
+#serverless package directories fro plugins
+node_modules
+
+# golang output binary directory
+bin

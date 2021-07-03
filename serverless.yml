@@ -1,0 +1,28 @@
+
+service: squawker-backend
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: go1.x
+  lambdaHashingVersion: 20201221
+
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'ca-central-1'}
+
+  environment:
+    FIREBASE_SERVER_KEY: <your_fcm_server_key_goes_here>
+
+package:
+  patterns:
+    - '!./**'
+    - ./bin/**
+
+functions:
+  hello:
+    handler: bin/hello
+    events:
+      - httpApi:
+          path: /hello/{tokenId}
+          method: post
