@@ -1,28 +1,39 @@
+service: test-app
 
-service: squawker-backend
-
-frameworkVersion: '2'
+frameworkVersion: "3"
 
 provider:
   name: aws
-  runtime: go1.x
-  lambdaHashingVersion: 20201221
-
+  runtime: provided.al2
+  architecture: arm64
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'ca-central-1'}
-
   environment:
-    FIREBASE_SERVER_KEY: <your_fcm_server_key_goes_here>
-
+    THUMBNAILS_S3_BUCKET: bentley-auto-thumbnail-${self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+          Resource: arn:aws:s3:::${self:provider.environment.THUMBNAILS_S3_BUCKET}/*
 package:
-  patterns:
-    - '!./**'
-    - ./bin/**
+  individually: true
 
 functions:
-  hello:
-    handler: bin/hello
+  saveDevice:
+    handler: bootstrap
+    package:
+      artifact: build/saveDevice.zip
     events:
       - httpApi:
-          path: /hello/{tokenId}
+          path: /save-device
+          method: post
+  sendSquawk:
+    handler: bootstrap
+    package:
+      artifact: build/sendSquawk.zip
+    events:
+      - httpApi:
+          path: /send-squawk
           method: post
